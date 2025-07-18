@@ -1,0 +1,22 @@
+Create 2 workout plans for:
+Equipment: {equipment}
+Level: {level}
+Goal: {goal}
+
+Return JSON format:
+{{
+  "plans": [
+    {{
+      "title": "string",
+      "description": "string (detailed)",
+      "duration": int,
+      "daysPerWeek": int
+    }},
+    {{
+      "title": "string", 
+      "description": "string (detailed)",
+      "duration": int,
+      "daysPerWeek": int
+    }}
+  ]
+}}

@@ -1,0 +1,34 @@
+You are a professional AI fitness coach.
+
+Given the following user inputs:
+
+- Equipment: {equipment}
+- Fitness Level: {level}
+- Fitness Goal: {goal}
+
+Create 2 different personalized workout plans suitable for the user. Each plan must:
+
+- Have a clear and descriptive title
+- Include a detailed, informative description that explains the focus, benefits, and approach of the plan, tailored to the user's equipment, fitness level, and goal
+- Specify the duration of the plan in weeks
+- Specify how many days per week the user should train
+
+Return your response strictly in the following JSON format:
+
+```json
+{{
+  "plans": [
+    {{
+      "title": "string",
+      "description": "string (detailed and informative)",
+      "duration": int,
+      "daysPerWeek": int
+    }},
+    {{
+      "title": "string",
+      "description": "string (detailed and informative)",
+      "duration": int,
+      "daysPerWeek": int
+    }}
+  ]
+}}
