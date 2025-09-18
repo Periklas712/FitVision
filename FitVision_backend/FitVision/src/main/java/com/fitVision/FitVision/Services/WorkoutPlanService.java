@@ -2,6 +2,8 @@ package com.fitVision.FitVision.Services;
 
 import com.fitVision.FitVision.Dtos.WorkoutPlanDto;
 import com.fitVision.FitVision.Dtos.WorkoutPlanRequestDto;
+import com.fitVision.FitVision.Exception.UserNotFoundException;
+import com.fitVision.FitVision.Exception.WorkoutNotFoundException;
 import com.fitVision.FitVision.Models.Enums.FitnessEquipment;
 import com.fitVision.FitVision.Models.Enums.FitnessGoal;
 import com.fitVision.FitVision.Models.Enums.FitnessLevel;
@@ -11,10 +13,10 @@ import com.fitVision.FitVision.Repositories.UserRepository;
 import com.fitVision.FitVision.Repositories.WorkoutPlanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatusCode;
 
 import java.util.List;
@@ -35,31 +37,34 @@ public class WorkoutPlanService {
     public WorkoutPlan getWorkoutPlan(Long WorkoutPlanId) {
         Optional<WorkoutPlan> workoutPlanOptional = workoutPlanRepository.findById(WorkoutPlanId);
         if (workoutPlanOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No workout plan found with id: " + WorkoutPlanId);
+            throw new WorkoutNotFoundException(WorkoutPlanId);
         }
         return workoutPlanOptional.get();
     }
 
-    public List<WorkoutPlan> getUserWorkoutPlanList(Long userId){
+    @Cacheable(value = "userWorkoutPlans", key = "#userId")
+    public List<WorkoutPlan> getUserWorkoutPlanList(Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No user found with id: " + userId);
+            throw new UserNotFoundException(userId);
         }
-
+        System.out.println("Fetching user's: " + userId + " workout plans from DB ");
         return userOptional.get().getMyWorkoutPlans();
 
     }
 
+    @CacheEvict(value = "userWorkoutPlans", key = "#userId")
     public void createUserWorkoutPlanList(Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No user found with id: " + userId);
+            throw new UserNotFoundException(userId);
         }
         User user = userOptional.get();
 
-        WorkoutPlanRequestDto requestDto = new WorkoutPlanRequestDto(user.getLevel().name(),user.getEquipment().name(),user.getGoal().name());
+        WorkoutPlanRequestDto requestDto = new WorkoutPlanRequestDto(user.getLevel().name(), user.getEquipment().name(),
+                user.getGoal().name());
 
-        try{
+        try {
             List<WorkoutPlanDto> generatedWorkoutPlans = webClient.post()
                     .uri("/CreateAndGetWorkoutPlans")
                     .bodyValue(requestDto)

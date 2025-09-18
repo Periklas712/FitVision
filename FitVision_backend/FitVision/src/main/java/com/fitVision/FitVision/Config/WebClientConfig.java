@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class WebClientConfig {
 
-    @Value("${fastapi.baseurl:http://localhost:8000}")
+    @Value("${FASTAPI_BASE_URL:http://localhost:8000}")
     private String fastApiBaseUrl;
     @Value("${fastapi.timeout.connect:5000}")
     private int connectTimeoutMillis;
@@ -27,7 +27,7 @@ public class WebClientConfig {
     @Value("${fastapi.timeout.write:30000}")
     private long writeTimeoutMillis;
 
-    @Bean(name="fastApiWebClient")
+    @Bean(name = "fastApiWebClient")
     public WebClient fastApiWebClient() {
         HttpClient httpClient = HttpClient.create()
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeoutMillis)

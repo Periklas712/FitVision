@@ -1,13 +1,14 @@
 package com.fitVision.FitVision.Services;
 
+import com.fitVision.FitVision.Exception.EmailExistException;
+import com.fitVision.FitVision.Exception.UserNotFoundException;
+import com.fitVision.FitVision.Exception.WorkoutNotFoundException;
 import com.fitVision.FitVision.Models.User;
 import com.fitVision.FitVision.Models.WorkoutPlan;
 import com.fitVision.FitVision.Repositories.UserRepository;
 import com.fitVision.FitVision.Repositories.WorkoutPlanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -15,30 +16,29 @@ import java.util.Optional;
 public class UserService {
 
     @Autowired
-    private  UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
     private WorkoutPlanRepository workoutPlanRepository;
 
-
     public User getUserById(Long userId) {
-      Optional<User> user = userRepository.findById(userId);
-      if (user.isEmpty()) {
-          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No user found with id: " + userId);
-      }
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException(userId);
+        }
         return user.get();
     }
 
-    public User createUser(User user){
+    public User createUser(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+            throw new EmailExistException(user.getEmail());
         }
         return userRepository.save(user);
     }
 
-    public User updateUser(User user){
+    public User updateUser(User user) {
         Optional<User> userOptional = userRepository.findById(user.getId());
         if (userOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No user found with id: " + user.getId());
+            throw new UserNotFoundException(userOptional.get().getId());
         }
         return userRepository.save(user);
     }
@@ -46,19 +46,19 @@ public class UserService {
     public void deleteUser(Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No user found with id: " + userId);
+            throw new UserNotFoundException(userId);
         }
-         userRepository.deleteById(userId);
+        userRepository.deleteById(userId);
     }
 
     public User updateUserWorkoutPlanList(Long userId, Long workoutPlanId) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No user found with id: " + userId);
+            throw new UserNotFoundException(userId);
         }
         Optional<WorkoutPlan> workoutPlan = workoutPlanRepository.findById(workoutPlanId);
         if (workoutPlan.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No workout plan found with id: " + workoutPlanId);
+            throw new WorkoutNotFoundException(workoutPlanId);
         }
 
         User userToUpdate = user.get();

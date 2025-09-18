@@ -1,0 +1,68 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: fitvision-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: fitdb
+      MYSQL_USER: fituser
+      MYSQL_PASSWORD: fitpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+
+  redis:
+    image: redis:7.2.1
+    container_name: fitvision-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 5
+
+  backend:
+    build: ./FitVision_backend
+    container_name: fitvision-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/fitdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: fituser
+      SPRING_DATASOURCE_PASSWORD: fitpass
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SPRING_CACHE_TYPE: redis
+      FASTAPI_BASE_URL: http://fastapi:8000
+    depends_on:
+      - mysql
+      - redis
+      - fastapi
+    restart: on-failure
+
+  frontend:
+    build: ./fitvision_frontend
+    container_name: fitvision-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+  fastapi:
+    build: ./Fitivsion_Ai
+    container_name: fitvision-fastapi
+    ports:
+      - "8000:8000"
+    # Remove MySQL dependency if not needed
+
+volumes:
+  mysql-data:
+  redis-data:
