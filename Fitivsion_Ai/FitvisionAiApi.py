@@ -7,9 +7,6 @@ from google.api_core.exceptions import ResourceExhausted
 
 app = FastAPI()
 
-workout_cache={}
-
-
 
 class RequestObject(BaseModel):
     fitnessLevel: str 

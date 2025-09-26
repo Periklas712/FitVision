@@ -4,13 +4,13 @@ import com.fitVision.FitVision.Dtos.WorkoutPlanDto;
 import com.fitVision.FitVision.Dtos.WorkoutPlanRequestDto;
 import com.fitVision.FitVision.Exception.UserNotFoundException;
 import com.fitVision.FitVision.Exception.WorkoutNotFoundException;
-import com.fitVision.FitVision.Models.Enums.FitnessEquipment;
-import com.fitVision.FitVision.Models.Enums.FitnessGoal;
-import com.fitVision.FitVision.Models.Enums.FitnessLevel;
 import com.fitVision.FitVision.Models.User;
 import com.fitVision.FitVision.Models.WorkoutPlan;
 import com.fitVision.FitVision.Repositories.UserRepository;
 import com.fitVision.FitVision.Repositories.WorkoutPlanRepository;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.CacheEvict;
@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.http.HttpStatusCode;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,18 +43,30 @@ public class WorkoutPlanService {
         return workoutPlanOptional.get();
     }
 
-    @Cacheable(value = "userWorkoutPlans", key = "#userId")
-    public List<WorkoutPlan> getUserWorkoutPlanList(Long userId) {
+    @Cacheable(value = "myPlans", key = "'myPlans:' + #userId")
+    @Transactional
+    public List<WorkoutPlanDto> getUserWorkoutPlanList(Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
             throw new UserNotFoundException(userId);
         }
         System.out.println("Fetching user's: " + userId + " workout plans from DB ");
-        return userOptional.get().getMyWorkoutPlans();
+
+        return userOptional.get().getMyWorkoutPlans().stream()
+                .map(plan -> {
+                    WorkoutPlanDto dto = new WorkoutPlanDto();
+                    dto.setTitle(plan.getTitle());
+                    dto.setDescription(plan.getDescription());
+                    dto.setDuration(plan.getDuration());
+                    dto.setDaysPerWeek(plan.getDaysPerWeek());
+                    dto.setUserId(userId);
+                    return dto;
+                })
+                .toList();
 
     }
 
-    @CacheEvict(value = "userWorkoutPlans", key = "#userId")
+    @CacheEvict(value = "myPlans", key = "'myPlans:' + #userId")
     public void createUserWorkoutPlanList(Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
@@ -82,16 +95,18 @@ public class WorkoutPlanService {
 
             System.out.println("Received " + generatedWorkoutPlans.size() + " workout plans from FastAPI");
 
+            List<WorkoutPlan> workoutPlansToSave = new ArrayList<>();
             for (WorkoutPlanDto dto : generatedWorkoutPlans) {
                 WorkoutPlan workoutPlan = new WorkoutPlan();
                 workoutPlan.setDescription(dto.getDescription());
                 workoutPlan.setTitle(dto.getTitle());
                 workoutPlan.setDuration(dto.getDuration());
                 workoutPlan.setDaysPerWeek(dto.getDaysPerWeek());
-                workoutPlan.setUser(userOptional.get());
-                workoutPlanRepository.save(workoutPlan);
-
+                workoutPlan.setUser(user);
+                workoutPlansToSave.add(workoutPlan);
             }
+
+            workoutPlanRepository.saveAll(workoutPlansToSave);
 
         } catch (Exception e) {
             System.err.println("Error calling FastAPI service: " + e.getMessage());

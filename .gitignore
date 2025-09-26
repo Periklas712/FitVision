@@ -1,12 +1,12 @@
-# Αρχεία περιβάλλοντος / κλειδιά
 .env
 .env.local
 application-secret.properties
 
-# Ιδιαίτερα για Python
 __pycache__/
 *.pyc
 
-# Ιδιαίτερα για Java
 target/
 *.class
+
+FitVision_Ai/promt-template.txt
+FitVision_Ai/promt-template2.txt

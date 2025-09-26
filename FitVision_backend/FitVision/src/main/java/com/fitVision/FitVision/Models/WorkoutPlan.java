@@ -1,11 +1,13 @@
 package com.fitVision.FitVision.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 
 @Entity
-@Table(name="WorkoutPlans")
+@Table(name = "WorkoutPlans")
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class WorkoutPlan {
 
     @Id
@@ -13,20 +15,20 @@ public class WorkoutPlan {
     private Long id;
     private String title;
     @NotEmpty
-    @Column(length = 10000)
-    @Lob
+    @Column(length = 10000, columnDefinition = "TEXT")
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name="user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     @JsonIgnore
     private User user;
 
     private int duration;
     private int daysPerWeek;
 
+    public WorkoutPlan() {
+    }
 
-    public WorkoutPlan() {}
     public WorkoutPlan(String title, String description, User user, int duration, int daysPerWeek) {
         this.title = title;
         this.description = description;

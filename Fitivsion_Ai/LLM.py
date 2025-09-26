@@ -2,9 +2,13 @@ import google.generativeai as genai
 import time
 import json
 from google.api_core.exceptions import ResourceExhausted
-import google.generativeai as genai
+import os
 
-genai.configure(api_key="AIzaSyDeR5BsM1Ak-RuKhyv-syEjkXSpqCQm2Eg")
+
+api_key = os.getenv("GOOGLE_API_KEY")
+if not api_key:
+    raise ValueError("GOOGLE_API_KEY is not set")
+genai.configure(api_key=api_key)
 
 def ask_llm(promt, max_retries=3, base_delay=60):
     

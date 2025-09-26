@@ -5,11 +5,10 @@ public class WorkoutPlanRequestDto {
     private String fitnessEquipment;
     private String fitnessGoal;
 
-
     public WorkoutPlanRequestDto(String fitnessLevel, String fitnessEquipment, String fitnessGoal) {
-    this.fitnessLevel = fitnessLevel;
-    this.fitnessEquipment = fitnessEquipment;
-    this.fitnessGoal = fitnessGoal;
+        this.fitnessLevel = fitnessLevel;
+        this.fitnessEquipment = fitnessEquipment;
+        this.fitnessGoal = fitnessGoal;
     }
 
     public String getFitnessLevel() {

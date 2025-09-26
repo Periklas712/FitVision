@@ -1,6 +1,5 @@
 package com.fitVision.FitVision.Dtos;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fitVision.FitVision.Models.Enums.FitnessEquipment;
 import com.fitVision.FitVision.Models.Enums.FitnessGoal;
 import com.fitVision.FitVision.Models.Enums.FitnessLevel;
@@ -17,8 +16,9 @@ public class UserDto {
     private FitnessEquipment equipment;
     private List<WorkoutPlan> myPlans;
 
-    public UserDto(Long id, String username, String email, FitnessGoal goal, FitnessLevel level, FitnessEquipment equipment, List<WorkoutPlan> myPlans) {
-        this.id=id;
+    public UserDto(Long id, String username, String email, FitnessGoal goal, FitnessLevel level,
+            FitnessEquipment equipment, List<WorkoutPlan> myPlans) {
+        this.id = id;
         this.username = username;
         this.email = email;
         this.goal = goal;
@@ -26,7 +26,9 @@ public class UserDto {
         this.equipment = equipment;
         this.myPlans = myPlans;
     }
-    public UserDto() {}
+
+    public UserDto() {
+    }
 
     public Long getId() {
         return id;

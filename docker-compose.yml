@@ -1,20 +1,22 @@
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: fitvision-mysql
+  postgres:
+    image: postgres:15
+    container_name: fitvision-postgres
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: fitdb
-      MYSQL_USER: fituser
-      MYSQL_PASSWORD: fitpass
+      POSTGRES_DB: fitvisiondatabase
+      POSTGRES_USER: fitvisionuser
+      POSTGRES_PASSWORD: fitvisionpass
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - mysql-data:/var/lib/mysql
+      - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD-SHELL", "pg_isready -U fitvisionuser -d fitvisiondatabase"]
       interval: 10s
+      timeout: 5s
       retries: 5
+      start_period: 30s
 
   redis:
     image: redis:7.2.1
@@ -35,17 +37,23 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/fitdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: fituser
-      SPRING_DATASOURCE_PASSWORD: fitpass
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fitvisiondatabase
+      SPRING_DATASOURCE_USERNAME: fitvisionuser
+      SPRING_DATASOURCE_PASSWORD: fitvisionpass
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: 6379
       SPRING_CACHE_TYPE: redis
       FASTAPI_BASE_URL: http://fastapi:8000
     depends_on:
-      - mysql
-      - redis
-      - fastapi
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      fastapi:
+        condition: service_started
     restart: on-failure
 
   frontend:
@@ -61,8 +69,15 @@ services:
     container_name: fitvision-fastapi
     ports:
       - "8000:8000"
-    # Remove MySQL dependency if not needed
+    environment:
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY} # Add this line
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
 volumes:
-  mysql-data:
+  postgres-data:
   redis-data:
