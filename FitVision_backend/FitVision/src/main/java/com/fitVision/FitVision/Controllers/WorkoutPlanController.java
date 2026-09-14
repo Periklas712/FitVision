@@ -3,7 +3,11 @@ package com.fitVision.FitVision.Controllers;
 import com.fitVision.FitVision.Dtos.WorkoutPlanDto;
 import com.fitVision.FitVision.Mappers.WorkoutPlanMapper;
 import com.fitVision.FitVision.Services.WorkoutPlanService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -11,10 +15,13 @@ import java.util.List;
 @RequestMapping("/api/workoutPlans")
 public class WorkoutPlanController {
 
-    @Autowired
-    private WorkoutPlanMapper workoutPlanMapper;
-    @Autowired
-    private WorkoutPlanService workoutPlanService;
+    private final WorkoutPlanMapper workoutPlanMapper;
+    private final WorkoutPlanService workoutPlanService;
+
+    public WorkoutPlanController(WorkoutPlanMapper workoutPlanMapper, WorkoutPlanService workoutPlanService) {
+        this.workoutPlanMapper = workoutPlanMapper;
+        this.workoutPlanService = workoutPlanService;
+    }
 
     @GetMapping("getWorkoutPlanById")
     public WorkoutPlanDto getWorkoutPlanById(@RequestParam("workoutPlanId") Long workoutPlanId) {
@@ -28,8 +35,15 @@ public class WorkoutPlanController {
     }
 
     @PostMapping("createUserWorkoutPlanList")
-    public void createUserWorkoutPlanList(@RequestParam("userId") Long userId) {
-        workoutPlanService.createUserWorkoutPlanList(userId);
+    public List<WorkoutPlanDto> createUserWorkoutPlanList(@RequestParam("userId") Long userId) {
+        return workoutPlanService.createUserWorkoutPlanList(userId);
+    }
+
+    @PatchMapping("rateWorkoutPlan")
+    @Validated
+    public WorkoutPlanDto rateWorkoutPLan(@RequestParam("workoutPlanId") Long workoutPlanId, @RequestParam("comment") String comment,
+                                          @Max(10) @Min(0) @RequestParam("stars") int stars) {
+        return workoutPlanMapper.map(workoutPlanService.rateWorkoutPlan(workoutPlanId, comment, stars));
     }
 
 }

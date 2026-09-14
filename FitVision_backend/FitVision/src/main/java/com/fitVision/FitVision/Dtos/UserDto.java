@@ -14,17 +14,15 @@ public class UserDto {
     private FitnessGoal goal;
     private FitnessLevel level;
     private FitnessEquipment equipment;
-    private List<WorkoutPlan> myPlans;
 
     public UserDto(Long id, String username, String email, FitnessGoal goal, FitnessLevel level,
-            FitnessEquipment equipment, List<WorkoutPlan> myPlans) {
+            FitnessEquipment equipment) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.goal = goal;
         this.level = level;
         this.equipment = equipment;
-        this.myPlans = myPlans;
     }
 
     public UserDto() {
@@ -36,14 +34,6 @@ public class UserDto {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public List<WorkoutPlan> getMyPlans() {
-        return myPlans;
-    }
-
-    public void setMyPlans(List<WorkoutPlan> myPlans) {
-        this.myPlans = myPlans;
     }
 
     public String getUsername() {

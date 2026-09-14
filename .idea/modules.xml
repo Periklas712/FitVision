@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/FitVision.iml" filepath="$PROJECT_DIR$/.idea/FitVision.iml" />
+      <module fileurl="file://$PROJECT_DIR$/FitVision_backend/FitVision/FitVision.iml" filepath="$PROJECT_DIR$/FitVision_backend/FitVision/FitVision.iml" />
     </modules>
   </component>
 </project>

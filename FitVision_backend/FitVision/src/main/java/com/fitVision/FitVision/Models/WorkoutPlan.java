@@ -3,7 +3,11 @@ package com.fitVision.FitVision.Models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "WorkoutPlans")
@@ -26,6 +30,13 @@ public class WorkoutPlan {
     private int duration;
     private int daysPerWeek;
 
+    // Rating fields
+    private String comment;
+    @Max(10)
+    @Min(0)
+    private int stars;
+    private LocalDate ratedAt;
+
     public WorkoutPlan() {
     }
 
@@ -40,7 +51,6 @@ public class WorkoutPlan {
     public String getTitle() {
         return title;
     }
-
     public void setTitle(String title) {
         this.title = title;
     }
@@ -48,7 +58,6 @@ public class WorkoutPlan {
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
@@ -56,7 +65,6 @@ public class WorkoutPlan {
     public int getDuration() {
         return duration;
     }
-
     public void setDuration(int duration) {
         this.duration = duration;
     }
@@ -64,7 +72,6 @@ public class WorkoutPlan {
     public int getDaysPerWeek() {
         return daysPerWeek;
     }
-
     public void setDaysPerWeek(int daysPerWeek) {
         this.daysPerWeek = daysPerWeek;
     }
@@ -72,7 +79,6 @@ public class WorkoutPlan {
     public @NotEmpty String getDescription() {
         return description;
     }
-
     public void setDescription(@NotEmpty String description) {
         this.description = description;
     }
@@ -80,8 +86,16 @@ public class WorkoutPlan {
     public User getUser() {
         return user;
     }
-
     public void setUser(User user) {
         this.user = user;
     }
+
+    public String getComment() { return comment; }
+    public void setComment(String comment) { this.comment = comment; }
+
+    public int getStars() { return stars; }
+    public void setStars(int stars) { this.stars = stars; }
+
+    public LocalDate getRatedAt() { return ratedAt; }
+    public void setRatedAt(LocalDate ratedAt) { this.ratedAt = ratedAt; }
 }

@@ -13,5 +13,6 @@ public interface UserMapper {
 
     @InheritInverseConfiguration
     @Mapping(source = "id", target = "id")
+    @Mapping(target = "myWorkoutPlans", ignore = true)
     User map(UserDto userDto);
 }

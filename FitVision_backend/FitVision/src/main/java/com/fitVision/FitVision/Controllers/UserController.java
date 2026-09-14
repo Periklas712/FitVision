@@ -1,46 +1,47 @@
 package com.fitVision.FitVision.Controllers;
 
+import com.fitVision.FitVision.Dtos.CreateUserRequest;
+import com.fitVision.FitVision.Dtos.UpdateUserRequest;
 import com.fitVision.FitVision.Dtos.UserDto;
 import com.fitVision.FitVision.Mappers.UserMapper;
-import com.fitVision.FitVision.Models.User;
 import com.fitVision.FitVision.Services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private UserMapper userMapper;
+    private final UserService userService;
+    private final UserMapper userMapper;
 
+    public UserController(UserService userService, UserMapper userMapper) {
+        this.userService = userService;
+        this.userMapper = userMapper;
+    }
 
     @GetMapping("getUserById")
-    public UserDto getUserById(@RequestParam("userId") Long userId){
+    public UserDto getUserById(@RequestParam("userId") Long userId) {
         return userMapper.map(userService.getUserById(userId));
     }
 
     @PostMapping("createUser")
-    public UserDto createUser(@RequestBody User user){
-        return userMapper.map(userService.createUser(user));
+    public ResponseEntity<UserDto> createUser(@Valid @RequestBody CreateUserRequest userRequest) {
+        UserDto created = userMapper.map(userService.createUser(userRequest));
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("updateUser")
-    public UserDto updateUser(@RequestBody User user){
-        return userMapper.map(userService.updateUser(user));
+    public UserDto updateUser(@Valid @RequestBody UpdateUserRequest userRequest) {
+        return userMapper.map(userService.updateUser(userRequest));
     }
 
     @DeleteMapping("deleteUser")
-    public void deleteUser(@RequestParam("userId") Long userId){
-         userService.deleteUser(userId);
+    public ResponseEntity<Void> deleteUser(@RequestParam("userId") Long userId) {
+        userService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
     }
-
-
-
-
-
 
 }

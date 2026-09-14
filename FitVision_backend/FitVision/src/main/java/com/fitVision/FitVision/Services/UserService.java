@@ -1,5 +1,7 @@
 package com.fitVision.FitVision.Services;
 
+import com.fitVision.FitVision.Dtos.CreateUserRequest;
+import com.fitVision.FitVision.Dtos.UpdateUserRequest;
 import com.fitVision.FitVision.Exception.EmailExistException;
 import com.fitVision.FitVision.Exception.UserNotFoundException;
 import com.fitVision.FitVision.Exception.WorkoutNotFoundException;
@@ -7,62 +9,76 @@ import com.fitVision.FitVision.Models.User;
 import com.fitVision.FitVision.Models.WorkoutPlan;
 import com.fitVision.FitVision.Repositories.UserRepository;
 import com.fitVision.FitVision.Repositories.WorkoutPlanRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
+@Slf4j
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private WorkoutPlanRepository workoutPlanRepository;
+    private final UserRepository userRepository;
+    private final WorkoutPlanRepository workoutPlanRepository;
 
-    public User getUserById(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            throw new UserNotFoundException(userId);
-        }
-        return user.get();
+    public UserService(UserRepository userRepository, WorkoutPlanRepository workoutPlanRepository) {
+        this.userRepository = userRepository;
+        this.workoutPlanRepository = workoutPlanRepository;
     }
 
-    public User createUser(User user) {
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+    }
+
+    public User createUser(CreateUserRequest user) {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new EmailExistException(user.getEmail());
         }
-        return userRepository.save(user);
+        User userToSave = new User(user);
+        return userRepository.save(userToSave);
     }
 
-    public User updateUser(User user) {
-        Optional<User> userOptional = userRepository.findById(user.getId());
-        if (userOptional.isEmpty()) {
-            throw new UserNotFoundException(userOptional.get().getId());
+    public User updateUser(UpdateUserRequest userRequest) {
+        User user = userRepository.findById(userRequest.getId())
+                .orElseThrow(() -> new UserNotFoundException(userRequest.getId()));
+
+        if (userRequest.getEmail() != null && !userRequest.getEmail().equals(user.getEmail())) {
+            if (userRepository.existsByEmail(userRequest.getEmail())) {
+                throw new EmailExistException(userRequest.getEmail());
+            }
+            user.setEmail(userRequest.getEmail());
+        }
+        if (userRequest.getUsername() != null) {
+            user.setUsername(userRequest.getUsername());
+        }
+        if (userRequest.getEquipment() != null) {
+            user.setEquipment(userRequest.getEquipment());
+        }
+        if (userRequest.getGoal() != null) {
+            user.setGoal(userRequest.getGoal());
+        }
+        if (userRequest.getLevel() != null) {
+            user.setLevel(userRequest.getLevel());
         }
         return userRepository.save(user);
     }
 
+    @CacheEvict(value = "myPlans", key = "'myPlans:' + #userId")
     public void deleteUser(Long userId) {
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (userOptional.isEmpty()) {
+        if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException(userId);
         }
         userRepository.deleteById(userId);
     }
 
+    @CacheEvict(value = "myPlans", key = "'myPlans:' + #userId")
     public User updateUserWorkoutPlanList(Long userId, Long workoutPlanId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            throw new UserNotFoundException(userId);
-        }
-        Optional<WorkoutPlan> workoutPlan = workoutPlanRepository.findById(workoutPlanId);
-        if (workoutPlan.isEmpty()) {
-            throw new WorkoutNotFoundException(workoutPlanId);
-        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+        WorkoutPlan workoutPlan = workoutPlanRepository.findById(workoutPlanId)
+                .orElseThrow(() -> new WorkoutNotFoundException(workoutPlanId));
 
-        User userToUpdate = user.get();
-        userToUpdate.addWorkoutPlan(workoutPlan.get());
-        return userRepository.save(userToUpdate);
+        user.addWorkoutPlan(workoutPlan);
+        return userRepository.save(user);
     }
 }

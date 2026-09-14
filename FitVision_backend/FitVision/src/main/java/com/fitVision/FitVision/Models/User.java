@@ -1,5 +1,6 @@
 package com.fitVision.FitVision.Models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fitVision.FitVision.Dtos.CreateUserRequest;
 import com.fitVision.FitVision.Models.Enums.FitnessEquipment;
 import com.fitVision.FitVision.Models.Enums.FitnessGoal;
 import com.fitVision.FitVision.Models.Enums.FitnessLevel;
@@ -7,6 +8,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,6 +20,7 @@ public class User {
     private Long id;
     private String username;
     @Email
+    @Column(unique = true)
     private String email;
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -31,15 +34,24 @@ public class User {
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<WorkoutPlan> myWorkoutPlans;
+    private List<WorkoutPlan> myWorkoutPlans = new ArrayList<>();
 
     public User() {}
+
     public User(String username,String email,FitnessLevel level,FitnessGoal goal,FitnessEquipment equipment ){
         this.username=username;
         this.email=email;
         this.level=level;
         this.goal=goal;
         this.equipment=equipment;
+    }
+
+    public User(CreateUserRequest userRequest) {
+        this.username = userRequest.getUsername();
+        this.email = userRequest.getEmail();
+        this.level = userRequest.getLevel();
+        this.goal = userRequest.getGoal();
+        this.equipment = userRequest.getEquipment();
     }
 
     public String getUsername() {
