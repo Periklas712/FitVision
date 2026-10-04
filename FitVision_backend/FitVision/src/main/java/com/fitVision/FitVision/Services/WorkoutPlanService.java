@@ -96,6 +96,7 @@ public class WorkoutPlanService {
                 workoutPlan.setDescription(dto.getDescription());
                 workoutPlan.setTitle(dto.getTitle());
                 workoutPlan.setDuration(dto.getDuration());
+                workoutPlan.setSummary(dto.getSummary());
                 workoutPlan.setDaysPerWeek(dto.getDaysPerWeek());
                 workoutPlan.setUser(user);
                 workoutPlansToSave.add(workoutPlan);

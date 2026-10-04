@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Setter
 @Getter
@@ -15,6 +14,7 @@ public class WorkoutPlanDto {
     private int duration;
     private int daysPerWeek;
     private Long userId;
+    private String summary;
     private String comment;
     private LocalDate ratedAt;
     private int stars;

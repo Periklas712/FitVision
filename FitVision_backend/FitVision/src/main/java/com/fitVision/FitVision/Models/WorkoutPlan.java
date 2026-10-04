@@ -21,6 +21,8 @@ public class WorkoutPlan {
     @NotEmpty
     @Column(length = 10000, columnDefinition = "TEXT")
     private String description;
+    @Column(columnDefinition = "TEXT")
+    private String summary;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -31,6 +33,7 @@ public class WorkoutPlan {
     private int daysPerWeek;
 
     // Rating fields
+    @Column(length = 1000)
     private String comment;
     @Max(10)
     @Min(0)
@@ -98,4 +101,7 @@ public class WorkoutPlan {
 
     public LocalDate getRatedAt() { return ratedAt; }
     public void setRatedAt(LocalDate ratedAt) { this.ratedAt = ratedAt; }
+
+    public String getSummary() { return summary; }
+    public void setSummary(String summary) { this.summary = summary; }
 }

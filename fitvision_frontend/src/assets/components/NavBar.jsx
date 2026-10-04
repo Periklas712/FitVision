@@ -1,55 +1,48 @@
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
-function NavBar() {   
-  const navigate = useNavigate();
+function NavBar() {
+  return (
+    <nav className="w-full bg-canvas px-4 pt-4 md:px-8 md:pt-6">
+      <div className="mx-auto flex max-w-screen-xl items-center justify-between gap-4">
+        <Link
+          to="/"
+          aria-label="FitVision home"
+          className="shrink-0 rounded-xl transition-transform duration-300 hover:scale-105 focus-visible:outline-2 focus-visible:outline-brand"
+        >
+          <img
+            src="/FitVisionLogo2.png"
+            alt="FitVision"
+            className="aspect-[3/2] h-12 object-cover drop-shadow-sm md:h-20"
+          />
+        </Link>
 
-  const handleLogoClick = () => {     
-    navigate('/');  
-  };    
-
-  const handleProfileClick = () => {     
-    navigate('/Profile');   
-  };    
-
-  return (     
-    <nav className="w-full bg-[#DFF1FF] px-8 py-6 shadow-sm ">       
-      <div className="max-w-screen-xl mx-auto flex justify-between items-center">                  
-        <div            
-          onClick={handleLogoClick}           
-          className="bg-[#DFF1FF] rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-md p-3 w-20 h-16"         
-        >           
-          <img             
-            src="/FitVisionLogo2.png"              
-            alt="FitVision"             
-            className="object-cover drop-shadow-sm"             
-            style={{ width: '150px', height: '100px' }}
-          />         
-        </div>         
-        
-        <div className="flex-1 flex-row text-center justify-center px-8">
-          <h1 className="tracking-in-expand text-[#f12a54] font-bold text-center bg-[#f12a54] bg-clip-text text-transparent drop-shadow-sm animate-pulse whitespace-nowrap" 
-              style={{fontSize: '48px'}}>
-            A new era of workouts 
-          </h1>
-          <p className="text-white-700 mb-7">Personalized workouts, powered by AI</p>
+        {/* min-w-0 + flex-1 let the tagline shrink and wrap between the logo and
+            the profile icon instead of pushing the page wider on small phones. */}
+        <div className="min-w-0 flex-1 text-center">
+          <p className="tracking-in-expand text-2xl leading-tight font-bold text-brand drop-shadow-sm sm:text-3xl md:text-4xl lg:text-5xl">
+            A new era of workouts
+          </p>
+          <p className="mt-1 hidden text-lg text-gray-700 sm:block">Personalized workouts, powered by AI</p>
         </div>
-                                   
-        <div            
-          onClick={handleProfileClick}           
-          className="flex items-center cursor-pointer transition-all duration-300 hover:bg-blue-50 hover:shadow-md rounded-lg p-3 hover:scale-105 w-20 h-16"         
-        >             
-          <img               
-            src="/person.png"               
-            alt="Profile"               
-            className="object-cover rounded-full border-2 border-white shadow-sm mx-auto"               
-            style={{width: '48px', height: '48px'}}
-          />         
-        </div>                
-      </div>  
-      <hr className="w-full border-t-2  border-gray-300" style={{color: '#f12a54'}}></hr>   
-    </nav> 
-  
-  ); 
-}  
+
+        {/* The label is hidden on phones to leave room for the tagline; the
+            aria-label keeps the link named for screen readers either way. */}
+        <Link
+          to="/MyPlans"
+          aria-label="My plans"
+          className="flex shrink-0 items-center gap-2 rounded-lg p-2 transition-all duration-300 hover:scale-105 hover:bg-blue-50 hover:shadow-md focus-visible:outline-2 focus-visible:outline-brand"
+        >
+          <span className="hidden text-xl text-ink lg:inline">My plans</span>
+          <img
+            src="/person.png"
+            alt=""
+            className="size-10 rounded-full border-2 border-white object-cover shadow-sm md:size-12"
+          />
+        </Link>
+      </div>
+      <hr className="mt-4 border-t-2 border-brand md:mt-6" />
+    </nav>
+  );
+}
 
 export default NavBar;

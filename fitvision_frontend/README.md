@@ -1,12 +1,13 @@
-# React + Vite
+# FitVision · frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React 19 + Vite 6 + Tailwind CSS v4 single-page app. See the [project README](../README.md)
+for what the app does, the architecture and how to run the whole stack.
 
-Currently, two official plugins are available:
+```bash
+npm install
+npm run dev      # dev server with hot reload on http://localhost:5173
+npm run build    # production build into dist/ (served by nginx in Docker)
+npm run lint
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+The API base URL lives in `src/assets/services/ApiHandler.jsx`.

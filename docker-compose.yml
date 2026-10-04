@@ -67,12 +67,13 @@ services:
   fastapi:
     build: ./Fitivsion_Ai
     container_name: fitvision-fastapi
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     environment:
-      GOOGLE_API_KEY: ${GOOGLE_API_KEY} # Add this line
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.5-flash-lite}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 30s
       timeout: 10s
       retries: 3

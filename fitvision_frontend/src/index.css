@@ -1,10 +1,41 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Tailwind v4 reads design tokens from @theme instead of tailwind.config.js.
+   Each token becomes utilities: --color-brand -> text-brand, bg-brand, border-brand;
+   --font-pixel -> font-pixel. */
+@theme {
+  --font-pixel: "VT323", monospace;
+  --color-brand: #f12a54;
+  --color-canvas: #dff1ff;
+  /* Dark navy from the same family as the hero image, used for outlines and
+     the dialog box so text stays readable over the busy background. */
+  --color-ink: #1b2a41;
+
+  /* Gentle up-and-down float, used as `animate-float` on the step illustrations. */
+  --animate-float: float 3s ease-in-out infinite;
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+}
 
 body {
-  font-family: 'VT323', monospace;
-  background-color: #DFF1FF;
+  font-family: var(--font-pixel);
+  background-color: var(--color-canvas);
+}
+
+/* Smooth scrolling for in-page links like "How it works", unless the user
+   has asked their OS for reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 ::-webkit-scrollbar {
@@ -12,6 +43,6 @@ body {
 }
 
 body {
-  -ms-overflow-style: none;  
+  -ms-overflow-style: none;
   scrollbar-width: none;
 }
