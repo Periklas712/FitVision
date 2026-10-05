@@ -8,5 +8,13 @@ __pycache__/
 target/
 *.class
 
-FitVision_Ai/promt-template.txt
-FitVision_Ai/promt-template2.txt
+# Showcase video project and renders (large media, built locally)
+brag-output/
+
+# Dependencies are installed per service (fitvision_frontend/node_modules)
+node_modules/
+
+# Personal IDE and tool settings
+.idea/
+.vscode/
+.claude/
